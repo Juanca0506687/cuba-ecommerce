@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Finalizar Compra{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-shopping-cart"></i> Finalizar Compra</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Tipo de Entrega -->
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Tipo de Entrega:</strong></label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="delivery_type" id="pickup" value="pickup" checked>
+                                <label class="form-check-label" for="pickup">
+                                    <i class="fas fa-store"></i> Recoger en Tienda
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="delivery_type" id="delivery" value="delivery">
+                                <label class="form-check-label" for="delivery">
+                                    <i class="fas fa-truck"></i> Mensajería (Entrega a domicilio)
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Dirección de Envío (solo para mensajería) -->
+                        <div class="mb-3" id="shipping_address_div" style="display: none;">
+                            <label for="shipping_address" class="form-label">
+                                <i class="fas fa-map-marker-alt"></i> Dirección de Envío *
+                            </label>
+                            <textarea class="form-control" id="shipping_address" name="shipping_address" rows="3" 
+                                      placeholder="Ingresa tu dirección completa para la entrega"></textarea>
+                            <small class="text-muted">* Obligatorio para mensajería</small>
+                        </div>
+
+                        <!-- Teléfono -->
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">
+                                <i class="fas fa-phone"></i> Teléfono *
+                            </label>
+                            <input type="tel" class="form-control" id="phone" name="phone" 
+                                   placeholder="Ej: 5351234567" required>
+                        </div>
+
+                        <!-- Notas -->
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">
+                                <i class="fas fa-sticky-note"></i> Notas Adicionales
+                            </label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                      placeholder="Instrucciones especiales, horarios de entrega, etc."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fab fa-whatsapp"></i> Comprar y Enviar por WhatsApp
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> Resumen de la Orden</h5>
+                </div>
+                <div class="card-body">
+                    {% for item in cart.cartitem_set.all %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>{{ item.quantity }}x {{ item.product.name }}</span>
+                        <span>{{ item.product.currency.symbol }}{{ item.subtotal }}</span>
+                    </div>
+                    {% endfor %}
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <strong>Total:</strong>
+                        <strong>{{ cart.total }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deliveryRadios = document.querySelectorAll('input[name="delivery_type"]');
+    const shippingAddressDiv = document.getElementById('shipping_address_div');
+    const shippingAddressInput = document.getElementById('shipping_address');
+
+    function toggleShippingAddress() {
+        const selectedDelivery = document.querySelector('input[name="delivery_type"]:checked').value;
+        
+        if (selectedDelivery === 'delivery') {
+            shippingAddressDiv.style.display = 'block';
+            shippingAddressInput.required = true;
+        } else {
+            shippingAddressDiv.style.display = 'none';
+            shippingAddressInput.required = false;
+        }
+    }
+
+    // Ejecutar al cargar la página
+    toggleShippingAddress();
+
+    // Ejecutar cuando cambie la selección
+    deliveryRadios.forEach(radio => {
+        radio.addEventListener('change', toggleShippingAddress);
+    });
+});
+</script>
+{% endblock %} 
