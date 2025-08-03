@@ -152,6 +152,12 @@ class Product(models.Model):
         
         return self.purchase_price
 
+    def get_image_url(self):
+        """Obtiene la URL de la imagen o una imagen de placeholder"""
+        if self.image and hasattr(self.image, 'url'):
+            return self.image.url
+        return "https://via.placeholder.com/300x200/cccccc/666666?text=Sin+Imagen"
+
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Usuario")
     created_at = models.DateTimeField(auto_now_add=True)
